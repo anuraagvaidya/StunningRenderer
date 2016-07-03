@@ -182,11 +182,11 @@ class StunningRenderer implements GLEventListener {
     public void init(GLAutoDrawable drawable) {
         GL2ES2 gl = drawable.getGL().getGL2ES2();
 
-        System.err.println("Chosen GLCapabilities: " + drawable.getChosenGLCapabilities());
-        System.err.println("INIT GL IS: " + gl.getClass().getName());
-        System.err.println("GL_VENDOR: " + gl.glGetString(GL.GL_VENDOR));
-        System.err.println("GL_RENDERER: " + gl.glGetString(GL.GL_RENDERER));
-        System.err.println("GL_VERSION: " + gl.glGetString(GL.GL_VERSION));
+        System.out.println("Chosen GLCapabilities: " + drawable.getChosenGLCapabilities());
+        System.out.println("INIT GL IS: " + gl.getClass().getName());
+        System.out.println("GL_VENDOR: " + gl.glGetString(GL.GL_VENDOR));
+        System.out.println("GL_RENDERER: " + gl.glGetString(GL.GL_RENDERER));
+        System.out.println("GL_VERSION: " + gl.glGetString(GL.GL_VERSION));
 
         //Get a id number to the uniform_Projection matrix
         //so that we can update it.

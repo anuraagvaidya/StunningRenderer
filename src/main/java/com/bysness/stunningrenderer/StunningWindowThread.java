@@ -2,7 +2,9 @@ package com.bysness.stunningrenderer;
 
 import org.eclipse.swt.widgets.Display;
 
+import java.awt.*;
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -11,30 +13,163 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class StunningWindowThread extends Thread {
     Thread t;
     final CopyOnWriteArrayList<String> commands;
-    private final ArrayList<StunningWindow> windows;
+    private final ConcurrentHashMap<String,StunningWindow> windows;
     private boolean stopped=false;
     StunningWindowThread()
     {
         commands=new CopyOnWriteArrayList<String>();
-        windows=new ArrayList<StunningWindow>();
+        windows=new ConcurrentHashMap<String,StunningWindow>();
     }
-    void API_createWindow()
+    String surround(String str)
     {
-        Display display = Display.getDefault();
-        StunningWindow window=new StunningWindow(display);
-        windows.add(window);
-        window.open();
-        window.layout();
+        return "\"" + str + "\"";
+    }
+    String keyValueStr(String key,String value)
+    {
+        return surround(key) + ":" + surround(value);
+    }
+    void API_createWindow(String windowId)
+    {
+        StunningWindow window=new StunningWindow();
+        windows.put(windowId,window);
+        API_Respond(keyValueStr("event","create") + "," + keyValueStr("object","window") + "," + keyValueStr("windowId",windowId));
+    }
+    void API_createTool(String windowId,String parentId,String toolId,String type)
+    {
+        if(windows.containsKey(windowId))
+        {
+            StunningWindow window=windows.get(windowId);
+            window.addComponent(toolId,parentId);
+            API_Respond(keyValueStr("event","create") + "," + keyValueStr("object","tool") + "," + keyValueStr("windowId",windowId) + "," + keyValueStr("toolId",toolId));
+        }
+        else
+        {
+            API_throwError("Incorrect window_id");
+        }
+    }
+    void API_setStyleWindow(String windowId,String param,String value)
+    {
+        if(windows.containsKey(windowId))
+        {
+            StunningWindow window=windows.get(windowId);
+            if(param.equals("title"))
+            {
+                window.design_frame.setTitle(value);
+            }
+            else if(param.equals("width"))
+            {
+                window.design_frame.setSize(Integer.parseInt(value),window.design_frame.getHeight());
+            }
+            else if(param.equals("height"))
+            {
+                window.design_frame.setSize(window.design_frame.getWidth(),Integer.parseInt(value));
+            }
+            API_Respond(keyValueStr("event","style_applied") + "," + keyValueStr("object","window") + "," + keyValueStr("windowId",windowId) + "," + keyValueStr("key",param) + "," + keyValueStr("value",value));
+        }
+        else
+        {
+            API_throwError("Incorrect window_id");
+        }
+    }
+    void API_setStyleTool(String windowId,String toolId,String param,String value)
+    {
+        if(windows.containsKey(windowId))
+        {
+            StunningWindow window=windows.get(windowId);
+            if(window.tools.containsKey(toolId))
+            {
+                StunningUI_Rectangle rect=window.tools.get(toolId);
+                if(param.equals("foregroundColor"))
+                {
+                    rect.style.foregroundColor=Color.decode(value);
+                }
+                else if(param.equals("width"))
+                {
+                    rect.style.width=Integer.parseInt(value);
+                }
+                else if(param.equals("height"))
+                {
+                    rect.style.height=Integer.parseInt(value);
+                }
+                else if(param.equals("left"))
+                {
+                    rect.style.left=Integer.parseInt(value);
+                }
+                else if(param.equals("top"))
+                {
+                    rect.style.top=Integer.parseInt(value);
+                }
+                API_Respond(keyValueStr("event","style_applied") + "," + keyValueStr("object","tool") + "," + keyValueStr("windowId",windowId) +"," + keyValueStr("toolId",toolId) + "," + keyValueStr("key",param) + "," + keyValueStr("value",value));
+                window.forceRender();
+            }
+            else
+            {
+                API_throwError("Incorrect toolId");
+            }
+        }
+        else
+        {
+            API_throwError("Incorrect window_id");
+        }
+    }
+    void API_throwError(String error)
+    {
+        System.out.println("{error:1,msg:\"" + error + "\"}");
+    }
+    void API_Respond(String response)
+    {
+        System.out.println("{ " + response + " }");
     }
     void decodeCommands()
     {
         for(int i=0;i<commands.size();i++)
         {
-            if(commands.get(i).equals("createwindow"))
+            String[] command=commands.get(i).split(":");
+            if(command[0].equals("createwindow"))
             {
-                API_createWindow();
+                if(command.length<2)
+                {
+                    API_throwError("Usage: createwindow:window_id");
+                }
+                else
+                {
+                    API_createWindow(command[1]);
+                }
             }
-            if(commands.get(i).equals("exit"))
+            else if(command[0].equals("createtool"))
+            {
+                if(command.length<5)
+                {
+                    API_throwError("Usage: createtool:window_id:parentId:toolId:type");
+                }
+                else
+                {
+                    API_createTool(command[1],command[2],command[3],command[4]);
+                }
+            }
+            else if(command[0].equals("windowstyle"))
+            {
+                if(command.length<4)
+                {
+                    API_throwError("Usage: windowstyle:window_id:param:value");
+                }
+                else
+                {
+                    API_setStyleWindow(command[1],command[2],command[3]);
+                }
+            }
+            else if(command[0].equals("toolstyle"))
+            {
+                if(command.length<5)
+                {
+                    API_throwError("Usage: toolstyle:window_id:tool_id:param:value");
+                }
+                else
+                {
+                    API_setStyleTool(command[1],command[2],command[3],command[4]);
+                }
+            }
+            else if(command[0].equals("exit"))
             {
                 stopped=true;
                 break;
@@ -43,33 +178,13 @@ public class StunningWindowThread extends Thread {
             i--;
         }
     }
-    void checkWindowStatus()
-    {
-        final Display display = Display.getDefault();
-        for(int i=0;i<windows.size();i++)
-        {
-            final int index = i;
-            display.syncExec(new Runnable () {
-                public void run ()
-                {
-                    if(!windows.get(index).isDisposed()) {
-                        windows.get(index).redraw();
-                        if (!display.readAndDispatch()) {
-                            display.sleep();
-                        }
-                    }
-                }
-            });
-
-        }
-    }
     @Override
     public void run()
     {
         while (!stopped)
         {
             decodeCommands();
-            checkWindowStatus();
+//            checkWindowStatus();
         }
         System.exit(0);
     }

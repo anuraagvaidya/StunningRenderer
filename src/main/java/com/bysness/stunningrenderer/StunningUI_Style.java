@@ -63,9 +63,11 @@ class StunningUI_Style {
         return new Color(swtColor.getRed(),swtColor.getGreen(),swtColor.getBlue());
     }
     StunningUI_Style(){
-        Display display = Display.getCurrent();
-        selectionColor=Color_SWTToAWT(display.getSystemColor(SWT.COLOR_LIST_SELECTION));
-        selectionTextColor=Color_SWTToAWT(display.getSystemColor(SWT.COLOR_LIST_SELECTION_TEXT));
+//        Display display = Display.getCurrent();
+        selectionColor=Color.BLUE;
+        selectionTextColor=Color.WHITE;
+//        selectionColor=Color_SWTToAWT(display.getSystemColor(SWT.COLOR_LIST_SELECTION));
+//        selectionTextColor=Color_SWTToAWT(display.getSystemColor(SWT.COLOR_LIST_SELECTION_TEXT));
     }
 
     String fontName="SansSerif";
