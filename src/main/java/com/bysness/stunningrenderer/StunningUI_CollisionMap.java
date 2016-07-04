@@ -45,10 +45,10 @@ public class StunningUI_CollisionMap {
     {
         int tileX=(int)(tilesPerLine/(surfaceWidth / x));
         int tileY=(int)(tilesPerLine/(surfaceHeight / y));
-        System.out.println("Finding components in " + tileX + "," + tileY + ", surfW: " + surfaceWidth + ", surfH: " + surfaceHeight);
+//        System.out.println("Finding components in " + tileX + "," + tileY + ", surfW: " + surfaceWidth + ", surfH: " + surfaceHeight);
         if(tileX + ((int)tilesPerLine * tileY)>=0 && (tileX + ((int)tilesPerLine * tileY))<tiles.size())
         {
-            System.out.println("Found " + tiles.get(tileX + ((int)tilesPerLine * tileY)).claimants.size() + " components in");
+//            System.out.println("Found " + tiles.get(tileX + ((int)tilesPerLine * tileY)).claimants.size() + " components in");
             return tiles.get(tileX + ((int)tilesPerLine * tileY)).claimants;
         }
         return null;
@@ -97,7 +97,7 @@ public class StunningUI_CollisionMap {
 
         if(sprite.tag.length()>0)
         {
-            System.out.println("Tiles for " + sprite.tag + "-> x0:" + tileX0 + ",y0:" + tileY0 + ",x1:" + tileX1 + ",y1:" + tileY1 + ",zoom:" + currentZoom);
+//            System.out.println("Tiles for " + sprite.tag + "-> x0:" + tileX0 + ",y0:" + tileY0 + ",x1:" + tileX1 + ",y1:" + tileY1 + ",zoom:" + currentZoom);
         }
         for(int i=tileX0;i<=tileX1;i++)
         {

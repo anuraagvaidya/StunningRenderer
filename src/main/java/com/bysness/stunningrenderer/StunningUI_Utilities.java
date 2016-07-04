@@ -101,7 +101,7 @@ public class StunningUI_Utilities {
                 int lastTopSprite=0;
                 for(int i=0;i<sprites.size();i++)
                 {
-                    System.out.println("text: " + sprites.get(i).text + ", hasExtra:" + (sprites.get(i).extras!=null) + ", cI:" + sprites.get(i).calculateZIndex());
+//                    System.out.println("text: " + sprites.get(i).text + ", hasExtra:" + (sprites.get(i).extras!=null) + ", cI:" + sprites.get(i).calculateZIndex());
                     int spriteZIndex=sprites.get(i).calculateZIndex();
                     if(spriteZIndex>lastTopSprite)
                     {

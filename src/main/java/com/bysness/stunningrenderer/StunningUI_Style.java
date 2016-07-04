@@ -7,6 +7,7 @@ import org.eclipse.swt.widgets.Display;
 
 import java.awt.*;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.image.BufferedImage;
 
 /**
@@ -50,6 +51,7 @@ class StunningUI_Style {
     float actualTop=0;
     float depth=0;
     int fontSize=20;
+    int fontStyle= Font.PLAIN;
     boolean overflowX=false;
     boolean overflowY=true;
     boolean scrollXVisible=false;

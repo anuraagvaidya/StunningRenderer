@@ -26,7 +26,7 @@ public class StunningScanner extends Thread {
         while(scanner.hasNext())
         {
             String command=scanner.next();
-            System.out.println("command is " + command);
+            System.out.println("{\"status\":\"ready\"}");
             queueCommand(command);
         }
     }
@@ -41,7 +41,7 @@ public class StunningScanner extends Thread {
     {
         t = new Thread (this, "Scanner");
         scanner = new Scanner(System.in);
-        System.out.print("Command please: ");
+        System.out.println("{\"status\":\"ready\"}");
         t.start();
         windowThread.start();
     }

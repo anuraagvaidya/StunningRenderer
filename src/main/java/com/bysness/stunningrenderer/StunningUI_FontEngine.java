@@ -32,8 +32,8 @@ public class StunningUI_FontEngine {
             graphics2D.fillRect(x, y, width, height);
         }
     }
-    private void setTextColor(StunningUI_Sprite sprite, Graphics2D graphics2D,StunningUI_TextInfo.LineSpecification line,int selectionStart){
-        if(selectionStart>=line.start && selectionStart-line.start<line.charWidths.size())
+    private void setTextColor(StunningUI_Sprite sprite, Graphics2D graphics2D,StunningUI_TextInfo.LineSpecification line,int selectionStart, int selectionEnd){
+        if(selectionStart>=line.start && selectionStart-line.start<line.charWidths.size() && selectionStart!=selectionEnd)
         {
             graphics2D.setColor(sprite.style.selectionTextColor);
         }
@@ -72,7 +72,7 @@ public class StunningUI_FontEngine {
         imageWidth=imageWidth==0?1:imageWidth;
         imageHeight=imageHeight==0?1:imageHeight;
 
-        System.out.println("text canvasWidth:" + imageWidth + ", text canvasHeight:" + imageHeight + ", lines:" + linesNeeded + ", rectHeight:" + rectHeight);
+//        System.out.println("text canvasWidth:" + imageWidth + ", text canvasHeight:" + imageHeight + ", lines:" + linesNeeded + ", rectHeight:" + rectHeight);
         BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics2D = image.createGraphics();
         RenderingHints rh = new RenderingHints(
@@ -157,7 +157,7 @@ public class StunningUI_FontEngine {
                 //Rectangle2D rect2=gv2.getLogicalBounds();
                 for (int j = 0; j < gv2.getNumGlyphs(); j++) {
                     Shape glypthShape=gv2.getGlyphOutline(j);
-                    setTextColor(sprite,graphics2D,prevLine,selectionStart);
+                    setTextColor(sprite,graphics2D,prevLine,selectionStart,selectionEnd);
                     graphics2D.fill(glypthShape);
                 }
                 lastStart=currentIndex;

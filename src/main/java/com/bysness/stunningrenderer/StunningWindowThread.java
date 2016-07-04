@@ -13,11 +13,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class StunningWindowThread extends Thread {
     Thread t;
     final CopyOnWriteArrayList<String> commands;
+    final CopyOnWriteArrayList<String> responses;
     private final ConcurrentHashMap<String,StunningWindow> windows;
     private boolean stopped=false;
     StunningWindowThread()
     {
         commands=new CopyOnWriteArrayList<String>();
+        responses=new CopyOnWriteArrayList<String>();
         windows=new ConcurrentHashMap<String,StunningWindow>();
     }
     String surround(String str)
@@ -30,77 +32,108 @@ public class StunningWindowThread extends Thread {
     }
     void API_createWindow(String windowId)
     {
-        StunningWindow window=new StunningWindow();
+        StunningWindow window=new StunningWindow(windowId,responses);
         windows.put(windowId,window);
         API_Respond(keyValueStr("event","create") + "," + keyValueStr("object","window") + "," + keyValueStr("windowId",windowId));
     }
-    void API_createTool(String windowId,String parentId,String toolId,String type)
+    void API_createTool(String windowId,String parentId,String toolId,String type,String paramAndValuesStr)
     {
         if(windows.containsKey(windowId))
         {
-            StunningWindow window=windows.get(windowId);
-            window.addComponent(toolId,parentId);
-            API_Respond(keyValueStr("event","create") + "," + keyValueStr("object","tool") + "," + keyValueStr("windowId",windowId) + "," + keyValueStr("toolId",toolId));
+            if(type.equals("rectangle"))
+            {
+                StunningWindow window=windows.get(windowId);
+                if(!window.tools.containsKey(toolId))
+                {
+                    window.addRectangle(toolId,parentId,paramAndValuesStr);
+                    API_Respond(keyValueStr("event","create") + "," + keyValueStr("object","tool") + "," + keyValueStr("windowId",windowId) + "," + keyValueStr("toolId",toolId));
+                }
+                else
+                {
+                    API_throwError("Tool already exists");
+                }
+            }
         }
         else
         {
             API_throwError("Incorrect window_id");
         }
     }
-    void API_setStyleWindow(String windowId,String param,String value)
+    void API_setStyleWindow(String windowId,String paramAndValuesStr)
     {
         if(windows.containsKey(windowId))
         {
-            StunningWindow window=windows.get(windowId);
-            if(param.equals("title"))
+            String[] paramAndValues=paramAndValuesStr.split("&");
+            for(int j=0;j<paramAndValues.length;j++)
             {
-                window.design_frame.setTitle(value);
+                String[] paramAndValue=paramAndValues[j].split("=");
+                String param=paramAndValue[0];
+                String value=paramAndValue[1];
+                value=value.replaceAll("\\$"," ");
+                StunningWindow window=windows.get(windowId);
+                if(param.equals("title"))
+                {
+                    window.design_frame.setTitle(value);
+                }
+                else if(param.equals("width"))
+                {
+                    window.design_frame.setSize(Integer.parseInt(value),window.design_frame.getHeight());
+                }
+                else if(param.equals("height"))
+                {
+                    window.design_frame.setSize(window.design_frame.getWidth(),Integer.parseInt(value));
+                }
+                else if(param.equals("state"))
+                {
+                    if(value.equals("maximized"))
+                    {
+                        window.design_frame.setState(Frame.MAXIMIZED_BOTH);
+                    }
+                    else if(value.equals("minimized"))
+                    {
+                        window.design_frame.setState(Frame.ICONIFIED);
+                    }
+                    else if(value.equals("normal"))
+                    {
+                        window.design_frame.setState(Frame.NORMAL);
+                    }
+                }
             }
-            else if(param.equals("width"))
-            {
-                window.design_frame.setSize(Integer.parseInt(value),window.design_frame.getHeight());
-            }
-            else if(param.equals("height"))
-            {
-                window.design_frame.setSize(window.design_frame.getWidth(),Integer.parseInt(value));
-            }
-            API_Respond(keyValueStr("event","style_applied") + "," + keyValueStr("object","window") + "," + keyValueStr("windowId",windowId) + "," + keyValueStr("key",param) + "," + keyValueStr("value",value));
+            API_Respond(keyValueStr("event","style_applied") + "," + keyValueStr("object","window") + "," + keyValueStr("windowId",windowId) + "," + keyValueStr("values",paramAndValuesStr));
         }
         else
         {
             API_throwError("Incorrect window_id");
         }
     }
-    void API_setStyleTool(String windowId,String toolId,String param,String value)
+    void API_setStyleTool(String windowId,String toolId,String paramAndValuesStr)
     {
         if(windows.containsKey(windowId))
         {
             StunningWindow window=windows.get(windowId);
             if(window.tools.containsKey(toolId))
             {
-                StunningUI_Rectangle rect=window.tools.get(toolId);
-                if(param.equals("foregroundColor"))
-                {
-                    rect.style.foregroundColor=Color.decode(value);
-                }
-                else if(param.equals("width"))
-                {
-                    rect.style.width=Integer.parseInt(value);
-                }
-                else if(param.equals("height"))
-                {
-                    rect.style.height=Integer.parseInt(value);
-                }
-                else if(param.equals("left"))
-                {
-                    rect.style.left=Integer.parseInt(value);
-                }
-                else if(param.equals("top"))
-                {
-                    rect.style.top=Integer.parseInt(value);
-                }
-                API_Respond(keyValueStr("event","style_applied") + "," + keyValueStr("object","tool") + "," + keyValueStr("windowId",windowId) +"," + keyValueStr("toolId",toolId) + "," + keyValueStr("key",param) + "," + keyValueStr("value",value));
-                window.forceRender();
+                window.setToolStyle(toolId,paramAndValuesStr);
+                API_Respond(keyValueStr("event","style_applied") + "," + keyValueStr("object","tool") + "," + keyValueStr("windowId",windowId) +"," + keyValueStr("toolId",toolId) + "," + keyValueStr("values",paramAndValuesStr));
+            }
+            else
+            {
+                API_throwError("Incorrect toolId");
+            }
+        }
+        else
+        {
+            API_throwError("Incorrect window_id");
+        }
+    }
+    void API_attachEvent(String windowId,String toolId,String event)
+    {
+        if(windows.containsKey(windowId))
+        {
+            StunningWindow window=windows.get(windowId);
+            if(window.tools.containsKey(toolId))
+            {
+                window.attachEvent(toolId,event);
             }
             else
             {
@@ -138,35 +171,46 @@ public class StunningWindowThread extends Thread {
             }
             else if(command[0].equals("createtool"))
             {
-                if(command.length<5)
+                if(command.length<6)
                 {
-                    API_throwError("Usage: createtool:window_id:parentId:toolId:type");
+                    API_throwError("Usage: createtool:window_id:parentId:toolId:type:params");
                 }
                 else
                 {
-                    API_createTool(command[1],command[2],command[3],command[4]);
+                    API_createTool(command[1],command[2],command[3],command[4],command[5]);
                 }
             }
             else if(command[0].equals("windowstyle"))
             {
-                if(command.length<4)
+                if(command.length<3)
                 {
-                    API_throwError("Usage: windowstyle:window_id:param:value");
+                    API_throwError("Usage: windowstyle:window_id:param1=value1&param2=value2");
                 }
                 else
                 {
-                    API_setStyleWindow(command[1],command[2],command[3]);
+                    API_setStyleWindow(command[1],command[2]);
                 }
             }
             else if(command[0].equals("toolstyle"))
             {
-                if(command.length<5)
+                if(command.length<4)
                 {
-                    API_throwError("Usage: toolstyle:window_id:tool_id:param:value");
+                    API_throwError("Usage: toolstyle:window_id:tool_id:param1=value1&param2=value2");
                 }
                 else
                 {
-                    API_setStyleTool(command[1],command[2],command[3],command[4]);
+                    API_setStyleTool(command[1],command[2],command[3]);
+                }
+            }
+            else if(command[0].equals("attachevent"))
+            {
+                if(command.length<4)
+                {
+                    API_throwError("Usage: attachevent:window_id:tool_id:event");
+                }
+                else
+                {
+                    API_attachEvent(command[1],command[2],command[3]);
                 }
             }
             else if(command[0].equals("exit"))
@@ -178,13 +222,26 @@ public class StunningWindowThread extends Thread {
             i--;
         }
     }
+
+    void pushResponses()
+    {
+        synchronized (responses)
+        {
+            for(int i=0;i<responses.size();i++)
+            {
+                System.out.println(responses.get(i));
+                responses.remove(i);
+                i--;
+            }
+        }
+    }
     @Override
     public void run()
     {
         while (!stopped)
         {
             decodeCommands();
-//            checkWindowStatus();
+            pushResponses();
         }
         System.exit(0);
     }

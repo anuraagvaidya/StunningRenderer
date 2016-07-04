@@ -72,6 +72,7 @@ class StunningRenderer implements GLEventListener {
         utilities=StunningUI_Utilities.getInstance();
 
         mainLayer=new StunningUI_Rectangle(null);
+        mainLayer.style.foregroundColor=new Color(255,255,255,255);
         System.setProperty("sun.awt.noerasebackground", "true");
 
         collisionMap=new StunningUI_CollisionMap();
@@ -117,7 +118,7 @@ class StunningRenderer implements GLEventListener {
                     if (notches < 0) {
                         message = "Mouse wheel moved UP "
                                 + -notches + " notch(es)" + "\n";
-                        System.out.println("leastTop:" + leastTop);
+//                        System.out.println("leastTop:" + leastTop);
 
                         if(
                                 sp.parent.style.overflowY &&
@@ -137,7 +138,7 @@ class StunningRenderer implements GLEventListener {
                     {
                         message = "Mouse wheel moved Down "
                             + notches + " notch(es)" + "\n";
-                        System.out.println("maxTopAndHeight:" + maxTopAndHeight + ", parentHeight:" + sp.parent.style.height);
+//                        System.out.println("maxTopAndHeight:" + maxTopAndHeight + ", parentHeight:" + sp.parent.style.height);
                         if(
                                 sp.parent.style.overflowY &&
                                 sp.parent.style.scrollYVisible &&
@@ -158,7 +159,7 @@ class StunningRenderer implements GLEventListener {
                         + " unit increments per notch" + "\n";
                 message += "    Units to scroll: " + e.getUnitsToScroll()
                         + " unit increments" + "\n";
-                System.out.println("Scroll event:" + message);
+//                System.out.println("Scroll event:" + message);
 
             }
         });
@@ -182,11 +183,11 @@ class StunningRenderer implements GLEventListener {
     public void init(GLAutoDrawable drawable) {
         GL2ES2 gl = drawable.getGL().getGL2ES2();
 
-        System.out.println("Chosen GLCapabilities: " + drawable.getChosenGLCapabilities());
+        /*System.out.println("Chosen GLCapabilities: " + drawable.getChosenGLCapabilities());
         System.out.println("INIT GL IS: " + gl.getClass().getName());
         System.out.println("GL_VENDOR: " + gl.glGetString(GL.GL_VENDOR));
         System.out.println("GL_RENDERER: " + gl.glGetString(GL.GL_RENDERER));
-        System.out.println("GL_VERSION: " + gl.glGetString(GL.GL_VERSION));
+        System.out.println("GL_VERSION: " + gl.glGetString(GL.GL_VERSION));*/
 
         //Get a id number to the uniform_Projection matrix
         //so that we can update it.

@@ -54,7 +54,7 @@ public class StunningUI_Rectangle extends StunningUI_Sprite {
 
         if(style.backgroundImage!=null || style.backgroundBufferedImage!=null)
         {
-            System.out.println("GENERATING TEXTURE");
+            //System.out.println("GENERATING TEXTURE");
 
             textureLoader=new StunningUI_TextureLoader(gl,style.backgroundRepeat);
             if(style.backgroundBufferedImage!=null)
@@ -77,7 +77,7 @@ public class StunningUI_Rectangle extends StunningUI_Sprite {
                 }
                 catch (Exception e)
                 {
-                    System.out.println("Unable to load background image");
+//                    System.out.println("Unable to load background image");
                     style.backgroundBufferedImage=null;
                     style.backgroundImage=null;
                 }

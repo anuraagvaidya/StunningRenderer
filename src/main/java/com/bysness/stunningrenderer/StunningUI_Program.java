@@ -109,7 +109,7 @@ public class StunningUI_Program {
 
         if(gl.isGL3core()){
             //todo: don't do this repeatedly
-            System.out.println("GL3 core detected: explicit add #version 130 to shaders");
+//            System.out.println("GL3 core detected: explicit add #version 130 to shaders");
             vertexShaderString_NoTexture = "#version 130\n"+vertexShaderString_NoTexture;
             fragmentShaderString_NoTexture = "#version 130\n"+fragmentShaderString_NoTexture;
         }
@@ -128,7 +128,9 @@ public class StunningUI_Program {
         //Check compile status.
         int[] compiled = new int[1];
         gl.glGetShaderiv(vertShader, GL2ES2.GL_COMPILE_STATUS, compiled,0);
-        if(compiled[0]!=0){System.out.println("Horray! vertex shader compiled");}
+        if(compiled[0]!=0){
+//            System.out.println("Horray! vertex shader compiled");
+        }
         else {
             int[] logLength = new int[1];
             gl.glGetShaderiv(vertShader, GL2ES2.GL_INFO_LOG_LENGTH, logLength, 0);
@@ -148,7 +150,9 @@ public class StunningUI_Program {
 
         //Check compile status.
         gl.glGetShaderiv(fragShader, GL2ES2.GL_COMPILE_STATUS, compiled,0);
-        if(compiled[0]!=0){System.out.println("Horray! fragment shader compiled");}
+        if(compiled[0]!=0){
+//            System.out.println("Horray! fragment shader compiled");
+        }
         else {
             int[] logLength = new int[1];
             gl.glGetShaderiv(fragShader, GL2ES2.GL_INFO_LOG_LENGTH, logLength, 0);
@@ -288,7 +292,7 @@ public class StunningUI_Program {
         // desktop OpenGL 3 and 4 drivers.
         if(gl.isGL3core()){
             //todo: don't do this repeatedly
-            System.out.println("GL3 core detected: explicit add #version 130 to shaders");
+//            System.out.println("GL3 core detected: explicit add #version 130 to shaders");
             vertexShaderString_WithTexture = "#version 130\n"+vertexShaderString_WithTexture;
             fragmentShaderString_WithTexture = "#version 130\n"+fragmentShaderString_WithTexture;
         }
@@ -307,7 +311,9 @@ public class StunningUI_Program {
         //Check compile status.
         int[] compiled = new int[1];
         gl.glGetShaderiv(vertShader, GL2ES2.GL_COMPILE_STATUS, compiled,0);
-        if(compiled[0]!=0){System.out.println("Horray! vertex shader compiled");}
+        if(compiled[0]!=0){
+//            System.out.println("Horray! vertex shader compiled");
+        }
         else {
             int[] logLength = new int[1];
             gl.glGetShaderiv(vertShader, GL2ES2.GL_INFO_LOG_LENGTH, logLength, 0);
@@ -327,7 +333,9 @@ public class StunningUI_Program {
 
         //Check compile status.
         gl.glGetShaderiv(fragShader, GL2ES2.GL_COMPILE_STATUS, compiled,0);
-        if(compiled[0]!=0){System.out.println("Horray! fragment shader compiled");}
+        if(compiled[0]!=0){
+//            System.out.println("Horray! fragment shader compiled");
+        }
         else {
             int[] logLength = new int[1];
             gl.glGetShaderiv(fragShader, GL2ES2.GL_INFO_LOG_LENGTH, logLength, 0);
